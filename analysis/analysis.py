@@ -25,8 +25,8 @@ def analysis(parameter_name, parameter_value, timeseries, weights_mat, tracts_ma
         for reg, mean_FR in zip(range(nb_region), np.mean(FR, axis=0)):
             store_npy['mean_FR_' + label + '_' + str(reg)] = float(mean_FR)
         store_npy['mean_FR_' + label] = float(np.mean(FR))
-        for reg, std_FR in zip(range(nb_region), np.std(FR, axis=0)):
-            store_npy['std_FR_' + label + '_' + str(reg)] = float(std_FR)
+        # for reg, std_FR in zip(range(nb_region), np.std(FR, axis=0)):
+        #     store_npy['std_FR_' + label + '_' + str(reg)] = float(std_FR)
         store_npy['std_FR_' + label] = float(np.std(FR))
         # Coefficient of variation
         store_npy['coeff_var_' + label] = float(np.mean(FR) / np.std(FR))
@@ -86,6 +86,7 @@ def analysis(parameter_name, parameter_value, timeseries, weights_mat, tracts_ma
         # Reason: longer tract, more time to reach effect, less synchronized.
         store_npy['corr_FC_tract_' + label] = np.corrcoef(x=FC.flatten(), y=tracts_mat.flatten())[0, 1]
     return store_npy
+
 
 
 if '__main__' == __name__:

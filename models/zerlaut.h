@@ -1,17 +1,17 @@
 // prototypes
-__device__ float TF_excitatory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_e, float tau_i);
-__device__ float TF_inhibitory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_i, float tau_i);
+__device__ float TF_excitatory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_e);
+__device__ float TF_inhibitory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_i);
 __device__ float TF(float fe, float fi, float fe_ext, float fi_ext, float W,
-float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, float P8, float P9, float E_l, float tau_i);
+float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, float P8, float P9, float E_l);
 __device__ void get_fluct_regime_vars(float Fe, float Fi, float Fe_ext, float Fi_ext, float W,
-                    float E_l, float tau_i, float *mu_V, float *sigma_V, float *T_V);
+                    float E_l, float *mu_V, float *sigma_V, float *T_V);
 __device__ float threshold_func(float muV, float sigmaV, float TvN, float P0, float P1, float P2, float P3, float P4,
                                 float P5, float P6, float P7, float P8, float P9);
 __device__ float estimate_firing_rate(float mu_V, float sigma_V, float T_V, float V_thre);
 
 
 // util functions
-__device__ float TF_excitatory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_e, float tau_i) {
+__device__ float TF_excitatory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_e) {
 
         /*
         transfer function for excitatory population
@@ -23,10 +23,10 @@ __device__ float TF_excitatory(float fe, float fi, float fe_ext, float fi_ext, f
         :return: result of transfer function
         */
 
-        return TF(fe, fi, fe_ext, fi_ext, W, P_e0, P_e1, P_e2, P_e3, P_e4, P_e5, P_e6, P_e7, P_e8, P_e9, E_L_e, tau_i);
+        return TF(fe, fi, fe_ext, fi_ext, W, P_e0, P_e1, P_e2, P_e3, P_e4, P_e5, P_e6, P_e7, P_e8, P_e9, E_L_e);
 }
 
-__device__ float TF_inhibitory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_i, float tau_i) {
+__device__ float TF_inhibitory(float fe, float fi, float fe_ext, float fi_ext, float W, float E_L_i) {
 
         /*
         transfer function for inhibitory population
@@ -38,12 +38,12 @@ __device__ float TF_inhibitory(float fe, float fi, float fe_ext, float fi_ext, f
         :return: result of transfer function
         */
 
-        return TF(fe, fi, fe_ext, fi_ext, W, P_i0, P_i1, P_i2, P_i3, P_i4, P_i5, P_i6, P_i7, P_i8, P_i9, E_L_i, tau_i);
+        return TF(fe, fi, fe_ext, fi_ext, W, P_i0, P_i1, P_i2, P_i3, P_i4, P_i5, P_i6, P_i7, P_i8, P_i9, E_L_i);
 }
 
 //header with global definitions for consts
 __device__ float TF(float fe, float fi, float fe_ext, float fi_ext, float W,
-float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, float P8, float P9, float E_l, float tau_i) {
+float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, float P8, float P9, float E_l) {
 
 	/*
 	transfer function for inhibitory population
@@ -64,7 +64,7 @@ float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, 
     float sigma_V;
     float T_V;
 
-	get_fluct_regime_vars(fe, fi, fe_ext, fi_ext, W, E_l, tau_i, &mu_V, &sigma_V, &T_V);
+	get_fluct_regime_vars(fe, fi, fe_ext, fi_ext, W, E_l, &mu_V, &sigma_V, &T_V);
 
 
 	float V_thre = threshold_func(mu_V, sigma_V, T_V*g_L/C_m,
@@ -74,7 +74,7 @@ float P0, float P1, float P2, float P3, float P4, float P5, float P6, float P7, 
 }
 
  __device__ void get_fluct_regime_vars(float Fe, float Fi, float Fe_ext, float Fi_ext, float W,
-                    float E_l, float tau_i, float *mu_V, float *sigma_V, float *T_V)
+                    float E_l, float *mu_V, float *sigma_V, float *T_V)
 {
     /*
     Compute the mean characteristic of neurons.
@@ -156,7 +156,7 @@ __device__ float threshold_func(float muV, float sigmaV, float TvN, float P0, fl
     float T = (TvN-TvN0)/DTvN0;
 
     // Eqns 11 from [MV_2018]
-    return P0 + P1*V + P2*S + P3*T + powf((P4*V),2) + powf((P5*S),2) + powf((P6*T),2) + P7*V*S + P8*V*T + P9*S*T;
+    return P0 + P1*V + P2*S + P3*T + P4*powf(V,2) + P5*powf(S,2) + P6*powf(T,2) + P7*V*S + P8*V*T + P9*S*T;
 }
 
 //@staticmethod
@@ -170,8 +170,5 @@ __device__ float estimate_firing_rate(float mu_V, float sigma_V, float T_V, floa
     :param Vthre:threshold of neurons
     */
     // Eqns 10 from [MV_2018]
-//    printf("mu_V T_V sigma_V V_thre %f %f %f %f\n", mu_V, sigma_V, T_V, V_thre);
-//    printf("erfc %f\n", erfcf((V_thre-mu_V) / (SQRT2*sigma_V)) / (2*T_V)  );
-
     return erfcf((V_thre-mu_V) / (SQRT2*sigma_V)) / (2*T_V);
 }

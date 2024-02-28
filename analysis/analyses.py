@@ -6,6 +6,7 @@
 # warnings.warn = warn
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import shutil
@@ -49,10 +50,10 @@ def mean_FC(FR, do_plot=False):
 
 def varFCD(FR, end_time, window=1000, overlap=100, k=2, do_plot=False):
     """Returns the average value of the variance of FCD matrix obtained from Pearson correlation of timetraces in FR."""
-    index = np.arange(0, end_time-window, overlap)
+    index = np.arange(0, end_time - window, overlap)
     FC_time_serie = []
-    for i in np.arange(0, FR.shape[0]-window, overlap):
-        FC_time_serie.append(np.corrcoef(np.transpose(FR[i:(i+window)])))
+    for i in np.arange(0, FR.shape[0] - window, overlap):
+        FC_time_serie.append(np.corrcoef(np.transpose(FR[i:(i + window)])))
     FC_time_serie = np.array(FC_time_serie)
     FCD = np.zeros((FC_time_serie.shape[0], FC_time_serie.shape[0]))
     for i, t_i in enumerate(FC_time_serie):
@@ -109,7 +110,7 @@ def detect_UP(train_cut, ratioThreshold=0.4,
     detect UP states from time signal
     (population rate or population spikes or cell voltage trace)
     return start and ends of states.
-    
+
     Written by Trang-Anh Nghiem. Modified with min_for_up by David Aquilue
 
     Parameters
@@ -423,7 +424,7 @@ def frequency_analysis(recorded_signal, fs, frequency_resolution=1.0):
     nperseg = int(fs / dF)
     welch_model = welch_psd(recorded_signal, fs=fs, nperseg=nperseg, axis=0)
     frequency_dominant = []
-    for f_reg in welch_model[1].swapaxes(0,1):
+    for f_reg in welch_model[1].swapaxes(0, 1):
         frequency_dominant.append(welch_model[0][np.argmax(f_reg)])
     # frequency_dominant = welch_model[0][np.argmax(welch_model[1])]
     return frequency_dominant
@@ -431,24 +432,24 @@ def frequency_analysis(recorded_signal, fs, frequency_resolution=1.0):
 
 def fit_psd_slope(frq, psd, range_fit=(0.1, 1000), type_mean='avg_psd'):
     """ Fits PSD to b/f^a which corresponds to a linear relationship in log(PSD) vs log(frq).
-    
+
     Parameters
     ----------
     frq: array_like
         Vector of frequencies, array of shape (N, )
-    
+
     psd: array_like
         Array containing the PSD (or PSDs). If single PSD, array of shape (N, ). If multiple (M)
         PSDs, array of shape (M, N). So, in each row a different PSD
 
     range_fit: tuple
         Sets the range of frequencies that will be used to fit the params.
-        
+
     type_mean: str
         For multiple PSDs.
         'avg_psd': For obtaining the fit on the average of all the PSDs
         'avg_slopes': For fitting each of the M PSD to b/f^a and then obtaining mean(a) and mean(b).
-        
+
     Returns
     -------
     a: float
@@ -458,10 +459,10 @@ def fit_psd_slope(frq, psd, range_fit=(0.1, 1000), type_mean='avg_psd'):
     """
     f_0 = frq[frq > range_fit[0]]
     f_f = f_0[f_0 < range_fit[1]]
-    
+
     if not len(psd.shape) == 1 and type_mean == 'avg_psd':
         psd = np.mean(psd, axis=0)
-        
+
     if len(psd.shape) == 1 or type_mean == 'avg_psd':  # Now both have same dimensions
         psd_0 = psd[frq > range_fit[0]]
         psd_f = psd_0[f_0 < range_fit[1]]
@@ -475,7 +476,7 @@ def fit_psd_slope(frq, psd, range_fit=(0.1, 1000), type_mean='avg_psd'):
         score = reg.score(X, Y)
 
         return a, b, score
-        
+
     elif not len(psd.shape) == 1 and type_mean == 'avg_slopes':
         a_m = np.array([])
         b_m = np.array([])
@@ -499,7 +500,7 @@ def fit_psd_slope(frq, psd, range_fit=(0.1, 1000), type_mean='avg_psd'):
         score = np.mean(score_m)
 
         return a, b, score
-        
+
     else:
         print('Check size of array if compatible with type of average. No computation done.')
         return 0, 0, 0
@@ -664,7 +665,7 @@ def sing_bi_modal_peaks(time_trace, do_plot=False):
             plt.show()
             plt.close()
 
-        if len(idx_peaks) ==0 or np.min(idx_peaks) <=5:  # Discuss this value
+        if len(idx_peaks) == 0 or np.min(idx_peaks) <= 5:  # Discuss this value
             return 0
         else:
             return 1
@@ -785,10 +786,10 @@ def rel_power_bands(frq, psd, bands=None, do_plot=False):
 
         if do_plot:
             c = next(color)
-            plt.fill_between(frq, psd, where=idx_band, color=c, alpha=0.5, label='$\\'+band+'$')
+            plt.fill_between(frq, psd, where=idx_band, color=c, alpha=0.5, label='$\\' + band + '$')
     if do_plot:
         plt.title('Relative power for bands')
-        plt.legend(loc=(1.04,0))
+        plt.legend(loc=(1.04, 0))
         plt.tight_layout()
         plt.show()
         plt.close()
@@ -831,8 +832,8 @@ def corr_dmn(fr, dmn_regions=None):
     FC = np.corrcoef(fr.T)
 
     for i in range(M):
-        for j in range(i): # If we want to take only one triangular portion of the matrix.
-        #for j in range(M):
+        for j in range(i):  # If we want to take only one triangular portion of the matrix.
+            # for j in range(M):
             if i == j:  # Not interested in diagonal
                 continue
             corr = FC[i, j]

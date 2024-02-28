@@ -202,16 +202,30 @@ class Driver_Setup:
 		# 	   0., 0.# external_input_ex_ex
 		# 	   ]
 
-		slh = [.2, .9,# coupling 8
-			   0.0, 100.0,# b_e 8
-			   -7, -4,# log(weight_noise) 4
-			   1.0, 7.0,# global_speed 4
-			   250, 750.,# tau_w_e 4
-			   -10.0, 20.0,# a_e 4
-			   0.3*1e-3, 0.5*1e-3,# external_input_ex_ex 2
-			   0., 0.5*1e-3,# external_input_ex_in 1
-			   0.3*1e-3, 0.5*1e-3,# external_input_in_ex 2
-			   0., 0.5*1e-3# external_input_in_in 1
+		# for all MDPI
+		# slh = [.2, .9,# coupling 8
+		# 	   0.0, 100.0,# b_e 8
+		# 	   -7, -4,# log(weight_noise) 4
+		# 	   1.0, 7.0,# global_speed 4
+		# 	   250, 750.,# tau_w_e 4
+		# 	   -10.0, 20.0,# a_e 4
+		# 	   0.3*1e-3, 0.5*1e-3,# external_input_ex_ex 2
+		# 	   0., 0.5*1e-3,# external_input_ex_in 1
+		# 	   0.3*1e-3, 0.5*1e-3,# external_input_in_ex 2
+		# 	   0., 0.5*1e-3# external_input_in_in 1
+		# 	   ]
+
+		# for timeseries plot for pahtlogical fixed point
+		slh = [.2, .9,  # coupling 8
+			   0.0, 120.0,  # b_e 8
+			   -7, -4,  # log(weight_noise) 4
+			   1.0, 7.0,  # global_speed 4
+			   250, 750.,  # tau_w_e 4
+			   -10.0, 20.0,  # a_e 4
+			   0.4 *1e-3, 0.5*1e-3,  # external_input_ex_ex 2
+			   0., 0.5 * 1e-3,  # external_input_ex_in 1
+			   0.4 *1e-3, 0.5*1e-3,  # external_input_in_ex 2
+			   0., 0.5 * 1e-3  # external_input_in_in 1
 			   ]
 
 		s0 = np.linspace(slh[0], slh[1], self.args.n_sweep_arg0)      # coupling
@@ -820,7 +834,7 @@ class Driver_Execute(Driver_Setup):
 					self.logger.info('Target_params is not found', target_params)
 
 			# dump only the best one to file
-			TSdictlist = self.make_TS_DictList(tavg0, cut_transient, fitness_sorting_indices[:16])
+			TSdictlist = self.make_TS_DictList(tavg0, cut_transient, fitness_sorting_indices[:18])
 
 			if np.isnan(ccFC).any():
 				print('ccFC?', np.where(np.isnan(ccFC))[0], 'in world:', my_rank)

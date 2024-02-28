@@ -286,7 +286,10 @@ __global__ void zerlaut(
             C_ee = state((t) % nh, i_node + 2 * n_node);
             C_ei = state((t) % nh, i_node + 3 * n_node);
             C_ii = state((t) % nh, i_node + 4 * n_node);
-            if (t!=0) W_e = state((t) % nh, i_node + 5 * n_node);
+//            if (t!=0) W_e = state((t) % nh, i_node + 5 * n_node);
+            if (t==0){W_e = 100;}
+            else {W_e = state((t) % nh, i_node + 5 * n_node);}
+
 //            W_i = state((t) % nh, i_node + 6 * n_node);
             noise = state((t) % nh, i_node + 6 * n_node);
 
@@ -328,58 +331,58 @@ __global__ void zerlaut(
             I_input_inhibitory = lc_I+external_input_in_in;
 
             // Transfer function of excitatory and inhibitory neurons
-            float _TF_e = TF_excitatory(E, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i);
-            float _TF_i = TF_inhibitory(E, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i);
+            float _TF_e = TF_excitatory(E, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e);
+            float _TF_i = TF_inhibitory(E, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i);
 
 //            printf("istep %d _TF_e %f \n", i_step, _TF_e);
 
-            float _diff_fe_e = (TF_excitatory(E+df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
-                               -TF_excitatory(E-df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+            float _diff_fe_e = (TF_excitatory(E+df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
+                               -TF_excitatory(E-df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                )/(2*df*1e3);
 
-            float _diff_fe_i = (TF_inhibitory(E+df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
-                               -TF_inhibitory(E-df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+            float _diff_fe_i = (TF_inhibitory(E+df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
+                               -TF_inhibitory(E-df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                )/(2*df*1e3);
 
-            float _diff_fi_e = (TF_excitatory(E, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
-                               -TF_excitatory(E, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+            float _diff_fi_e = (TF_excitatory(E, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
+                               -TF_excitatory(E, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                )/(2*df*1e3);
 
-            float _diff_fi_i = (TF_inhibitory(E, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
-                               -TF_inhibitory(E, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+            float _diff_fi_i = (TF_inhibitory(E, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
+                               -TF_inhibitory(E, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                )/(2*df*1e3);
 
-            float _diff2_fe_fe_e = (TF_excitatory(E+df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+            float _diff2_fe_fe_e = (TF_excitatory(E+df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                    -2*_TF_e
-                                   +TF_excitatory(E-df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+                                   +TF_excitatory(E-df, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                    )/powdf;
 
-            float _diff2_fe_fe_i = (TF_inhibitory(E+df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+            float _diff2_fe_fe_i = (TF_inhibitory(E+df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                    -2*_TF_i
-                                   +TF_inhibitory(E-df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+                                   +TF_inhibitory(E-df, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                    )/powdf;
 
             // diff of different
-            float _diff2_fe_fi = (TF_excitatory(E+df, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
-                                 -TF_excitatory(E+df, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
-                                 -TF_excitatory(E-df, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
-                                 +TF_excitatory(E-df, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+            float _diff2_fe_fi = (TF_excitatory(E+df, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
+                                 -TF_excitatory(E+df, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
+                                 -TF_excitatory(E-df, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
+                                 +TF_excitatory(E-df, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                  )/(4*powdf);
 
-            float _diff2_fi_fe = (TF_inhibitory(E+df, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
-                                 -TF_inhibitory(E+df, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
-                                 -TF_inhibitory(E-df, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
-                                 +TF_inhibitory(E-df, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+            float _diff2_fi_fe = (TF_inhibitory(E+df, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
+                                 -TF_inhibitory(E+df, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
+                                 -TF_inhibitory(E-df, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
+                                 +TF_inhibitory(E-df, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                  )/(4*powdf);
 
-            float _diff2_fi_fi_e = (TF_excitatory(E, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+            float _diff2_fi_fi_e = (TF_excitatory(E, I+df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                    -2*_TF_e
-                                   +TF_excitatory(E, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i)
+                                   +TF_excitatory(E, I-df, E_input_excitatory, I_input_excitatory, W_e, E_L_e)
                                    )/powdf;
 
-            float _diff2_fi_fi_i = (TF_inhibitory(E, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+            float _diff2_fi_fi_i = (TF_inhibitory(E, I+df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                    -2*_TF_i
-                                   +TF_inhibitory(E, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i)
+                                   +TF_inhibitory(E, I-df, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i)
                                    )/powdf;
 
 
@@ -427,11 +430,11 @@ __global__ void zerlaut(
                     )/T);
 
             // Adaptation excitatory
-            get_fluct_regime_vars(E, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e, tau_i,
+            get_fluct_regime_vars(E, I, E_input_excitatory, I_input_excitatory, W_e, E_L_e,
                                     &mu_V, &sigma_V, &T_V);
             dW_e = dt * (-W_e/tau_w_e+b_e*E+a_e*(mu_V-E_L_e)/tau_w_e);
 
-//            get_fluct_regime_vars(E, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i, tau_i,
+//            get_fluct_regime_vars(E, I, E_input_inhibitory, I_input_inhibitory, W_i, E_L_i,
 //                                    &mu_V, &sigma_V, &T_V);
 //            dW_i = dt * (-W_i/tau_w_i+b_i*I+a_i*(mu_V-E_L_i)/tau_w_i);
 
